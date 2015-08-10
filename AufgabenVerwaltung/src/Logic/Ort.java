@@ -6,7 +6,7 @@ public class Ort {
     private String bezeichnung;
     private String strasse;
     private String hausNummer;
-    private String plz;
+    private String plz; //String becauase of 0 at begin of some PLZs
     
     
     
@@ -56,9 +56,9 @@ public class Ort {
     public Ort(int ortId, String bezeichnung, String strasse, String hausNummer, String plz) {
         super();
         this.OrtId = ortId;
-        this.bezeichnung = bezeichnung;
-        this.strasse = strasse;
-        this.hausNummer = hausNummer;
+        this.bezeichnung = bezeichnung.toUpperCase();
+        this.strasse = strasse.toUpperCase();
+        this.hausNummer = hausNummer.toLowerCase();
         this.plz = plz;
     }
     

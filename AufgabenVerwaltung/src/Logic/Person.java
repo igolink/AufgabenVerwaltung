@@ -50,7 +50,7 @@ public class Person {
     }
     
     
-    public void setDatum(GregorianCalendar userGeburtsDatum) {
+    public void setDatum(GregorianCalendar userGeburtsDatum){
         this.userGeburtsDatum = userGeburtsDatum;
     }
     

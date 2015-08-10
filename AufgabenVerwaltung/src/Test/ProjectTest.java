@@ -8,13 +8,21 @@ import java.util.GregorianCalendar;
 //import java.util.HashSet;
 //import java.util.List;
 
+
+
+
 //import org.junit.Before;
 //import org.junit.BeforeClass;
 import org.junit.Test;
 //import org.junit.After;
 
-import Frontend.FrontEnd;
+
+
+
+import Frontend.KonsoleFrontEnd;
+//import Frontend.KonsoleFrontEnd;
 import Logic.Aufgabe;
+import Logic.Ort;
 import Logic.Project;
 import Logic.Person;
 import Logic.Betrieb;
@@ -29,8 +37,9 @@ public class ProjectTest {
     Aufgabe a = new Aufgabe(0, 1, "Testaufgabe", 0, 1, 0, new GregorianCalendar(), 500, 1, Arrays.asList("Mach nach", "Mach mit", "Mach besser"));
     Aufgabe a2 = new Aufgabe(1, testProjekt.getProjectId(), "Testaufgabe2", 0, 1, 0, new GregorianCalendar(), 400, 1, Arrays.asList("Mach nach", "Mach mit", "Mach besser"));;
     Aufgabe a3 = new Aufgabe();
-    Person muster = new Person(1, "Muster", "zu Musterdorf", 0, 1, new GregorianCalendar(1905, 4, 1));
+    Person prs = new Person(1, "Muster", "zu Musterdorf", 0, 1, new GregorianCalendar(1905, 4, 1));
     Project p = new Project(1, "Megasuperproject", "dient dem Testen");
+    Ort o = new Ort();
 //    }
 
     @Test
@@ -58,31 +67,24 @@ public class ProjectTest {
 //        assertEquals(neu3, testProjekt.("15"));
 //    }
     
-//    @Test
-//    public void testDatumEingabe(){
-//        a.setAnfangsDatum(FrontEnd.dateEingabe());
-//        System.out.println(a.getAnfangsDatum().toString());
-//        assertNotNull(a.getAnfangsDatum());
-//   }
+    @Test
+    public void testDatumEingabe(){
+        a.setAnfangsDatum(KonsoleFrontEnd.dateEingabe());
+//        GregorianCalendar datum = new GregorianCalendar(1999, 5, 3);
+//        a.setAnfangsDatum(new GregorianCalendar(1999, 6, 3));
+        System.out.println(a.getAnfangsDatum().getTime().toString());
+        assertNotNull(a.getAnfangsDatum());
+   }
     
     @Test
-    public void personTest(){
+    public void notNullTest(){ //wegen nullPointerException im Frontend
         Betrieb firma = new Betrieb();
-        assertNotNull(firma.personen);
+        assertNotNull(firma.getPersonen());
+        assertNotNull(firma.getAufgaben());
+        assertNotNull(firma.getOrte());
+        assertNotNull(firma.getProjekte());
     }
     
-    @Test
-    public void personAufgaben(){
-        Betrieb firma = new Betrieb();
-        assertNotNull(firma.aufgaben);
-    }
-    
-    @Test
-    public void personProjekte(){
-        Betrieb firma = new Betrieb();
-        assertNotNull(firma.projekte);
-    }
-
     @Test
     public void addiereAufgabeTest(){
         tst.addiereAufgabe(a2);
@@ -91,21 +93,22 @@ public class ProjectTest {
     
     @Test
     public void addierePersonTest(){
-        tst.addierePerson(muster);
-        assertEquals(muster, tst.getPersonById(muster.getPersonId()));
+        tst.addierePerson(prs);
+        assertEquals(prs, tst.getPersonById(prs.getPersonId()));
     }
     
     @Test
     public void addierePojectTest(){
         tst.adddiereProject(p);
-        assertEquals(p, tst.getProjectById(muster.getPersonId()));
+        assertEquals(p, tst.getProjectById(p.getProjectId()));
     }
     
     @Test
-    public void blablaTest(){
-        tst.adddiereProject(p);
-        assertEquals(p, tst.getProjectById(muster.getPersonId()));
+    public void addiereOrtTest(){
+        tst.addiereOrt(o);
+        tst.addiereOrt(new Ort(2, "Musterdorf", "musterStrasse", "15b", "01069"));
+        tst.listeDerOrte();
+        assertEquals(o, tst.getOrtById(o.getOrtId()));
+        assertEquals(2, tst.getOrtById(2).getOrtId());
     }
-    
-    
 }
