@@ -15,7 +15,7 @@ public class Aufgabe {
     private int bearbeiterId;
     private int status;
     private GregorianCalendar anfangsDatum;
-    private int stundenBudget; // ob hier besser budget in stunden wäre?
+    private int stundenBudget; 
     private int ausuebungsOrtId;
 // budget? deadline?    längere Beschreibung?
     
@@ -79,12 +79,12 @@ public class Aufgabe {
         this.anfangsDatum = anfangsDatum;
     }
     
-    public int getAbsehbareLaengeInTage() {
+    public int getStundenBudget() {
         return stundenBudget;
     }
     
-    public void setAbsehbareLaengeInTage(int absehbareLaengeInTage) {
-        this.stundenBudget = absehbareLaengeInTage;
+    public void setStundenBudget(int stundenBudget) {
+        this.stundenBudget = stundenBudget;
     }
     
     public int getAusuebungsOrt() {
@@ -114,6 +114,13 @@ public class Aufgabe {
     public String[] getAufgabenArt() {
         return aufgabenArt;
     }
+    public void printAufgabeShort(){
+        System.out.println("AufgabenID: " + this.getAufgabeId() + "; ProjektID: " + this.getProjectId() + 
+                "; Aufgabenbezeichnung: " + this.getBezeichnung() + "; BearbeiterID: " + this.getBearbeiterId() + "; StundenBudget: " + this.getStundenBudget() + ".\n"); 
+      
+    }
+    
+    
     public Aufgabe(int aufgabeId, int projectId, String bezeichnung, int prioritaet, int bearbeiterId, int status, GregorianCalendar anfangsDatum,
             int absehbareLaengeInTage, int ausuebungsOrtId, List<String> zusaetzlicheMerkmale) {
         super();

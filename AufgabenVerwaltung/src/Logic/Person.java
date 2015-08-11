@@ -45,12 +45,12 @@ public class Person {
     public void setOrt(int ortId) {
         this.ortId = ortId;
     }
-    public GregorianCalendar getDatum() {
+    public GregorianCalendar getUserGeburtsDatum() {
         return userGeburtsDatum;
     }
     
     
-    public void setDatum(GregorianCalendar userGeburtsDatum){
+    public void setUserGeburtsDatum(GregorianCalendar userGeburtsDatum){
         this.userGeburtsDatum = userGeburtsDatum;
     }
     

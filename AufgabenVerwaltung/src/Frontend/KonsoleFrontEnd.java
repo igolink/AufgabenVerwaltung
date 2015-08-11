@@ -105,7 +105,7 @@ public class KonsoleFrontEnd {
         }
         if (!abbruch){
             betrieb.addiereOrt(ort);
-            betrieb.ortCsvWriter(ort);
+            betrieb.orteCsvWriter(betrieb.getOrte());
             System.out.println();
             System.out.println("Ein neues Ort wurde erfolgreich eingetragen!");
             System.out.println();
@@ -178,7 +178,7 @@ public class KonsoleFrontEnd {
 
         while(!abbruch){ //Geburtsdatumseingabe
             System.out.println("Geben Sie bitte das Geburtsdatum der Person ein: ");    //überarbeiten, ohne abbruchmöglichkeit schlecht
-            person.setDatum(dateEingabe());                                             //hier boolean zurückliefern (erfolg/abbruch)
+            person.setUserGeburtsDatum(dateEingabe());                                             //hier boolean zurückliefern (erfolg/abbruch)
             break;
                 
             }
@@ -217,7 +217,7 @@ public class KonsoleFrontEnd {
         }
         if(!abbruch) {
             betrieb.addierePerson(person);
-            betrieb.personCsvWriter(person);
+            betrieb.personenCsvWriter(betrieb.getPersonen());
             System.out.println();
             System.out.println("Eine neue Person wurde erfolgreich eingetragen!");
             System.out.println();
@@ -226,7 +226,6 @@ public class KonsoleFrontEnd {
     }
     
 // ==================================================Projekt=====================================================
-    
     public static void addiereNeuesProjektAusDerKonsole(int iD){
         boolean abbruch = false;
         String inData;
@@ -266,9 +265,10 @@ public class KonsoleFrontEnd {
             }
             badInputMessage();       
         }
+
         if (!abbruch){
             betrieb.adddiereProject(projekt);
-            if (betrieb.projectCsvWriter(projekt)) System.out.println("Projekt gespeichert.");
+            if (betrieb.projectsCsvWriter(betrieb.getProjekte())) System.out.println("Projekt gespeichert.");
             else System.out.println("Kein Erfolg beim Speichern des Projektes. Mist.");
             System.out.println();
             System.out.println("Ein neues Projekt wurde erfolgreich eingetragen!");
@@ -419,7 +419,6 @@ public class KonsoleFrontEnd {
             } 
             badInputMessage();
         }
-    
             
         while(!abbruch){ //hier war am Anfang die absehbare Länge in Tagen. Jetzt Stundenbudget.
             System.out.println("Geben Sie bitte das Stundenbudget für diese Aufgabe ein (oder \"exit\" für Abbruch): ");
@@ -430,7 +429,7 @@ public class KonsoleFrontEnd {
                 break;
             }
             else if (areDigits(inData)){
-                aufgabe.setAbsehbareLaengeInTage(Integer.parseInt(inData)); //wie prüfen, ob es zugänglich ist?
+                aufgabe.setStundenBudget(Integer.parseInt(inData)); 
                 break;
             }
             badInputMessage();
@@ -460,14 +459,17 @@ public class KonsoleFrontEnd {
         
         if (!abbruch){
             betrieb.addiereAufgabe(aufgabe);  //erfolgreicher Eintrag neuer Aufgabe
-            if (betrieb.aufgabeCsvWriter(aufgabe)) System.out.println("Gelungen");
+
+            if (betrieb.aufgabenCsvWriter(betrieb.getAufgaben())) System.out.println("Gelungen");
             else System.out.println("Kein Erfolg beim Speichern. Mist!");
+
             System.out.println();
             System.out.println("Eine neue Aufgabe wurde erfolgreich eingetragen!");
 
             System.out.println();
 
         }
+        
         else System.out.println("Vorgang abgebrochen. Keine neue Aufgabe eingetragen."); //abgebrochene Eingabe. ABER. WAS IST MIT EINGETRAGENEN ORT, PERSON, PROJECT USW. DIE ANLEGEMÖGLICHKEIT GAR ENTNEHMEN?
     }
     
@@ -510,7 +512,7 @@ public class KonsoleFrontEnd {
             System.out.println("Monat (mm):");
             eingabe = scan.nextInt();
             if ((eingabe > 0) && (eingabe <= 12)){
-                monat = eingabe + 1;  
+                monat = eingabe - 1;  
                 break;
             }
             badInputMessage();
@@ -559,16 +561,16 @@ public class KonsoleFrontEnd {
             System.out.println();
             switch (inData.toUpperCase()){
                 case "HELP": help();  break;
-                case "NEWPRJ": addiereNeuesProjektAusDerKonsole(projektIdZaehler++); break;
-                case "NEWTASK": addiereNeueAufgabeAusDerKonsole(aufgabenIdZaehler++); break;
-                case "NEWPLACE": addiereNeuenOrtAusDerKonsole(ortIdZaehler++); break;
-                case "NEWSTUFF": addiereNeuePersonAusDerKonsole(personIdZaehler++); break;
-                case "PRINTPRJ": betrieb.listeDerProjekte(); break;
+                case "NEWPRJ": addiereNeuesProjektAusDerKonsole(projektIdZaehler);  projektIdZaehler++;  break;
+                case "NEWTASK": addiereNeueAufgabeAusDerKonsole(aufgabenIdZaehler); aufgabenIdZaehler++; break;
+                case "NEWPLACE": addiereNeuenOrtAusDerKonsole(ortIdZaehler);        ortIdZaehler++;      break;
+                case "NEWSTUFF": addiereNeuePersonAusDerKonsole(personIdZaehler);   personIdZaehler++;   break;
+                case "PRINTPRJ": betrieb.listeDerProjekte();   break;
                 case "PRINTTASKS": betrieb.listeDerAufgaben(); break;
                 case "PRINTSTUFF": betrieb.listeDerPersonen(); break;
-                case "PRINTPLACES": betrieb.listeDerOrte(); break;
-                case "TASKPRJ": break;
-                case "DELTASK": break;
+                case "PRINTPLACES": betrieb.listeDerOrte();    break;
+                case "TASKPRJ":    break;
+                case "DELTASK":    break;
                 case "UPDATETASK": break;
                 case "EXIT": abbruch = true; break;
                 default: System.out.println("Befehl nicht erkannt."); System.out.println(); break;
