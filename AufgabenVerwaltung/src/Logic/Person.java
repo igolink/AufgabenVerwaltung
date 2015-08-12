@@ -33,9 +33,14 @@ public class Person {
     public void setNachName(String nacName) {
         this.nachName = nacName;
     }
-    public char getGeschlecht() {
+    public char getGeschlechtAsChar() {
         return GESCHLECHT[geschlecht];
     }
+    
+    public int getGeschlecht(){
+        return this.geschlecht;
+    }
+    
     public void setGeschlecht(int geschlecht) {
         this.geschlecht = geschlecht;
     }

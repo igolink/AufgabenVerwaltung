@@ -1,18 +1,21 @@
 package Logic;
 
-
+//import Logic.Aufgabe;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 
@@ -24,18 +27,15 @@ public class Betrieb{
     private Set<Ort> orte;
     private Set<Aufgabe> aufgaben;
     private final char TRENNZEICHEN = ',';
-    private final char ARRAYSEPARATOR = ';';
-
+    private final char ARRAY_SEPARATOR = ';';
     
     public Set<Person> getPersonen() {
         return personen;
     }
-
     
     public Set<Project> getProjekte() {
         return projekte;
     }
-
 
        public Set<Ort> getOrte() {
         return orte;
@@ -65,11 +65,17 @@ public class Betrieb{
 
     public void listeDerPersonen(){
         for (Person pers:personen){
-            System.out.println("PersID: " + pers.getPersonId() + "; Vorname: " + pers.getVorName() + "; Nachname: " + pers.getNachName() + "; Wohnort: " + getOrtById(pers.getOrtId()).getBezeichnung() + ".");
+            System.out.println("PersID: " + pers.getPersonId() + 
+                             "; Vorname: " + pers.getVorName() + 
+                             "; Nachname: " + pers.getNachName() + 
+                             "; Wohnort: " + getOrtById(pers.getOrtId()).getBezeichnung() + ".");
+            
             System.out.println("Beteiligt in folgenden Aufgaben:");
 //            for (Aufgabe a:aufgaben){
 //                if (a.getBearbeiter() == pers.getPersonId()){
-//                    System.out.println("\t Aufgabe:" + a.getBezeichnung() + "; Projekt: " + getProjectById(a.getProjektId()).getProjectBezeichnung() + ".");
+//                    System.out.println("\t Aufgabe:" + a.getBezeichnung() + 
+//                                        "; Projekt: " + getProjectById(a.getProjektId()).getProjectBezeichnung() + 
+//                                        ".");
 //                }
 //            }
         }
@@ -82,10 +88,56 @@ public class Betrieb{
     public boolean personIdExists(int iD){
         boolean r = false;
         for (Person p:personen){
-            if (p.getPersonId() == iD) r = true; break;
+            if (p.getPersonId() == iD){ 
+                r = true; 
+                break;
+            }
         }
         return r;
     }
+
+    public boolean personenCsvReader(){
+        
+        boolean fileAlreadyExists = new File("personen.csv").exists();
+             
+        if (fileAlreadyExists){
+            try {
+                BufferedReader csvInput = new BufferedReader(new FileReader("personen.csv"));
+                String row;
+                GregorianCalendar birthDate = new GregorianCalendar();
+                
+                while((row = csvInput.readLine()) != null){
+                    String[] personRow = row.split(",");
+ 
+                    try{
+                        birthDate.setTime(new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", Locale.ENGLISH).parse(personRow[5]));
+                    }catch(ParseException p){
+                        System.out.println("Falscher Datenformat, so ein Mist!");
+                        csvInput.close();
+                        return false;
+                    }
+
+                    personen.add(new Person(Integer.parseInt(personRow[0]), 
+                                             personRow[1], 
+                                             personRow[2], 
+                                             Integer.parseInt(personRow[3]),
+                                             Integer.parseInt(personRow[4]),
+                                             birthDate));
+                                             
+                }
+                    csvInput.close();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    return false;
+                }
+        }
+        else{
+            System.out.println("Die Datei \"personen.csv\" existiert nicht!");
+            return false;
+        }
+        return true;
+    }
+
     
 
     public boolean personenCsvWriter(Set<Person> personen){
@@ -96,22 +148,21 @@ public class Betrieb{
                 File f = new File("personen.csv");
                 f.delete();
             }
-                
             
-            BufferedWriter csvOutput = new BufferedWriter(new FileWriter("personen.csv", true), ',');
+            BufferedWriter csvOutput = new BufferedWriter(new FileWriter("personen.csv", true));
             
             for (Person pers:personen){
-                csvOutput.write(pers.getPersonId());
+                csvOutput.write(String.valueOf(pers.getPersonId()));
                 csvOutput.write(TRENNZEICHEN);
                 csvOutput.write(pers.getVorName());
                 csvOutput.write(TRENNZEICHEN);                
                 csvOutput.write(pers.getNachName());
                 csvOutput.write(TRENNZEICHEN);
-                csvOutput.write(pers.getGeschlecht());
+                csvOutput.write(String.valueOf(pers.getGeschlecht()));
                 csvOutput.write(TRENNZEICHEN);
-                csvOutput.write(pers.getUserGeburtsDatum().getTime().toString());
+                csvOutput.write(String.valueOf(pers.getOrtId()));
                 csvOutput.write(TRENNZEICHEN);
-                csvOutput.write(pers.getOrtId());
+                csvOutput.write(pers.getUserGeburtsDatum().getTime().toString());                
                 csvOutput.newLine();
             }
             csvOutput.close();
@@ -140,11 +191,13 @@ public class Betrieb{
     }
     
     public String toString(Aufgabe aufgabe){
-        return ("AufgabenID: " + aufgabe.getAufgabeId() + "; Bezeichnung: " + aufgabe.getBezeichnung() + 
-                "; Projekt: " + getProjectById(aufgabe.getProjectId()).getProjectBezeichnung() + "; " + "Bearbeiter: " + 
-                getPersonById(aufgabe.getBearbeiterId()).getName() + ".\n" + "Aufgabenpriorität (1: niedrig bis 10: hoch): " + 
-                aufgabe.getPrioritaet() + "; Aufgabenstatus: " + aufgabe.getStatus() + "; Anfang: " + aufgabe.getAnfangsDatum().toString() + 
-                "; Ausübungsstandort: " + getOrtById(aufgabe.getAusuebungsOrt()).getBezeichnung());
+        return ("AufgabenID: " + aufgabe.getAufgabeId() + 
+              "; Bezeichnung: " + aufgabe.getBezeichnung() + 
+              "; Projekt: " + getProjectById(aufgabe.getProjectId()).getProjectBezeichnung() + 
+              "; Bearbeiter: " + getPersonById(aufgabe.getBearbeiterId()).getName() + 
+            ".\n Aufgabenpriorität (1: niedrig bis 10: hoch): " + aufgabe.getPrioritaet() + 
+              "; Aufgabenstatus: " + aufgabe.getStatusAsString() + "; Anfang: " + aufgabe.getAnfangsDatum().toString() + 
+              "; Ausübungsstandort: " + getOrtById(aufgabe.getAusuebungsOrt()).getBezeichnung());
     }
     
     public void listeDerAufgaben(){
@@ -171,76 +224,89 @@ public class Betrieb{
  
     public boolean aufgabenCsvReader(){
         
-        boolean alreadyExists = new File("aufgaben.csv").exists();
+        boolean fileAlreadyExists = new File("aufgaben.csv").exists();
              
-        if (alreadyExists){
+        if (fileAlreadyExists){
             try {
                 BufferedReader csvInput = new BufferedReader(new FileReader("aufgaben.csv"));
-                String line;
-                while((line = csvInput.readLine()) != null){
-                    String[] aufgabe = line.split(",");
-                    aufgaben.add(new Aufgabe(Integer.parseInt(aufgabe[0]), Integer.parseInt(aufgabe[1]), aufgabe[2], Integer.parseInt(aufgabe[3]), 
-                                  Integer.parseInt(aufgabe[4]), Integer.parseInt(aufgabe[5]), Integer.parseInt(aufgabe[6]), Integer.parseInt(aufgabe[7]),
-                                  new GregorianCalendar.setTime((Date)((new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", Locale.GERMAN)).parse(aufgabe[8])))),
-                                  null);
+                String row;
+                List<String> dummy = null;
+                GregorianCalendar taskDateOfStart = new GregorianCalendar();
+                
+                while((row = csvInput.readLine()) != null){
+                    String[] taskRow = row.split(",");
+ 
+                    try{
+                        taskDateOfStart.setTime(new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", Locale.ENGLISH).parse(taskRow[6]));
+                    }catch(ParseException p){
+                        System.out.println("Falscher Datenformat, so ein Mist!");
+                        csvInput.close();
+                        return false;
+                    }
+
+                    aufgaben.add(new Aufgabe(Integer.parseInt(taskRow[0]), 
+                                             Integer.parseInt(taskRow[1]), 
+                                             taskRow[2], 
+                                             Integer.parseInt(taskRow[3]), 
+                                             Integer.parseInt(taskRow[4]), 
+                                             Integer.parseInt(taskRow[5]), 
+                                             taskDateOfStart, 
+                                             Integer.parseInt(taskRow[7]), 
+                                             Integer.parseInt(taskRow[8]), 
+                                             dummy));
+                    
                 }
-                csvInput.close();
-//che-to ne rabotaet...                
-            } catch (IOException e){
-                e.printStackTrace();
-                return false;
-            }
+                    csvInput.close();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    return false;
+                }
+            
         }
         else{
-            System.out.println("Die Datei \"orte.csv\" existiert nicht!");
+            System.out.println("Die Datei \"aufgaben.csv\" existiert nicht!");
             return false;
         }
         return true;
     }
-    
-    
+ 
     public boolean aufgabenCsvWriter(Set<Aufgabe> aufgaben){
         
-            boolean alreadyExists = new File("aufgaben.csv").exists();
+        boolean fileAlreadyExists = new File("aufgaben.csv").exists();
             
-            
-            try {
+        try {
+            if (fileAlreadyExists){
+                File f = new File("aufgaben.csv");
+                f.delete();
+            }
                 
-                if (alreadyExists){
-                    File f = new File("aufgaben.csv");
-                    f.delete();
-                }
-                
-                BufferedWriter csvOutput = new BufferedWriter(new FileWriter("aufgaben.csv", true), ',');
-                
-                // if the file didn't already exist then we need to write out the header line
+            BufferedWriter csvOutput = new BufferedWriter(new FileWriter("aufgaben.csv", true));
 
-                    
-                    
-                for (Aufgabe a:aufgaben){
-                    csvOutput.write(a.getAufgabeId());
-                    csvOutput.write(TRENNZEICHEN);                    
-                    csvOutput.write(a.getProjectId());
-                    csvOutput.write(TRENNZEICHEN);
-                    csvOutput.write(a.getBezeichnung());
-                    csvOutput.write(TRENNZEICHEN);
-                    csvOutput.write(a.getPrioritaet());
-                    csvOutput.write(TRENNZEICHEN);
-                    csvOutput.write(a.getStatus());
-                    csvOutput.write(TRENNZEICHEN);
-                    csvOutput.write(a.getBearbeiterId());
-                    csvOutput.write(TRENNZEICHEN);
-                    csvOutput.write(a.getAusuebungsOrt());
-                    csvOutput.write(TRENNZEICHEN);
-                    csvOutput.write(a.getStundenBudget());
-                    csvOutput.write(TRENNZEICHEN);
-                    csvOutput.write(a.getAnfangsDatum().getTime().toString()); //ob das lesen dann leicht ist
-//                    csvOutput.write(a.getAufgabenArt());
+            for (Aufgabe a:aufgaben){
+                csvOutput.write(String.valueOf(a.getAufgabeId()));
+                csvOutput.write(TRENNZEICHEN);                    
+                csvOutput.write(String.valueOf(a.getProjectId()));
+                csvOutput.write(TRENNZEICHEN);
+                csvOutput.write(a.getBezeichnung());
+                csvOutput.write(TRENNZEICHEN);
+                csvOutput.write(String.valueOf(a.getPrioritaet()));
+                csvOutput.write(TRENNZEICHEN);
+                csvOutput.write(String.valueOf(a.getBearbeiterId()));
+                csvOutput.write(TRENNZEICHEN);
+                csvOutput.write(String.valueOf(a.getStatus()));
+                csvOutput.write(TRENNZEICHEN);
+                csvOutput.write(a.getAnfangsDatum().getTime().toString());                     
+                csvOutput.write(TRENNZEICHEN);
+                csvOutput.write(String.valueOf(a.getStundenBudget()));
+                csvOutput.write(TRENNZEICHEN);
+                csvOutput.write(String.valueOf(a.getAusuebungsOrt()));
+//                csvOutput.write(TRENNZEICHEN);
+//                csvOutput.write(a.getAufgabenArt());
 //                    csvOutput.write(TRENNZEICHEN);
 //                    List<String> sl = a.getZusaetzlicheMerkmale();
 //                    for (String i:sl){
 //                        csvOutput.write(i);
-//                        csvOutput.write(ARRAYSEPARATOR);
+//                        csvOutput.write(ARRAY_SEPARATOR);
 //                     }
                     csvOutput.newLine();
                 }
@@ -252,7 +318,18 @@ public class Betrieb{
             return true;
 }
     
-    
+    public boolean replaceAufgabe(Aufgabe neueAufgabe){
+        int iD = neueAufgabe.getAufgabeId();
+        for(Aufgabe temp:aufgaben){
+            if (temp.getAufgabeId() == iD){
+                aufgaben.remove(temp);              //evtl. loescheAufgabe hier nutzen
+                aufgaben.add(neueAufgabe);
+                return true;
+            }
+        }
+        System.out.println("Austauschen ungelungen.");
+        return false;
+    }
     
 //==================================================Orte============================================   
     public boolean addiereOrt(Ort ort){
@@ -322,12 +399,10 @@ public class Betrieb{
                 File f = new File("orte.csv");
                 f.delete();
             }
-
-            BufferedWriter csvOutput = new BufferedWriter(new FileWriter("orte.csv", true), ',');
+            BufferedWriter csvOutput = new BufferedWriter(new FileWriter("orte.csv", true));
                
-            // if the file didn't already exist then we need to write out the header line
             for(Ort ort:orte){
-                csvOutput.write(ort.getOrtId());
+                csvOutput.write(String.valueOf(ort.getOrtId()));
                 csvOutput.write(TRENNZEICHEN);
                 csvOutput.write(ort.getBezeichnung());
                 csvOutput.write(TRENNZEICHEN);
@@ -345,8 +420,38 @@ public class Betrieb{
         }
         return true;
     }
-
     
+    public boolean orteCsvReader(){
+        
+        boolean fileAlreadyExists = new File("orte.csv").exists();
+             
+        if (fileAlreadyExists){
+            try {
+                BufferedReader csvInput = new BufferedReader(new FileReader("orte.csv"));
+                String line;
+                
+                while((line = csvInput.readLine()) != null){
+                    String[] ortsLine = line.split(",");
+
+                    orte.add(new Ort(Integer.parseInt(ortsLine[0]), 
+                                     ortsLine[1], 
+                                     ortsLine[2], 
+                                     ortsLine[3],
+                                     ortsLine[4]));
+                                             
+                }
+                    csvInput.close();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    return false;
+                }
+        }
+        else{
+            System.out.println("Die Datei \"ort.csv\" existiert nicht!");
+            return false;
+        }
+        return true;
+    }
 //==================================================Projekte============================================    
     
     public boolean adddiereProject(Project prj){
@@ -382,29 +487,6 @@ public class Betrieb{
         return this.projekte.remove(getProjectById(iD));
     }
     
-    
-    public boolean projectCsvReader(){
-        
-        boolean alreadyExists = new File("projekte.csv").exists();
-        
-        if (alreadyExists){
-            try {
-                BufferedReader csvInput = new BufferedReader(new FileReader("projekte.csv"));
-                String line;
-                while((line = csvInput.readLine()) != null){
-                    String[] projekt = line.split(",");
-                    projekte.add(new Project(Integer.parseInt(projekt[0]), projekt[1], projekt[2]));
-                }
-                csvInput.close();
-                
-            } catch (IOException e){
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return true;
-    }
-    
     public boolean projectsCsvWriter(Set<Project> projekte){
         
         boolean alreadyExists = new File("projekte.csv").exists();
@@ -415,14 +497,14 @@ public class Betrieb{
                 f.delete();
             }
             
-            BufferedWriter csvOutput = new BufferedWriter(new FileWriter("projekte.csv", true), ',');
+            BufferedWriter csvOutput = new BufferedWriter(new FileWriter("projekte.csv", true));
             
             for(Project prj:projekte){
-                csvOutput.write(prj.getProjectId());
+                csvOutput.write(String.valueOf(prj.getProjectId()));
                 csvOutput.write(TRENNZEICHEN);
-                csvOutput.write(prj.getProjectBezeichnung());
+                csvOutput.write(String.valueOf(prj.getProjectBezeichnung()));
                 csvOutput.write(TRENNZEICHEN);
-                csvOutput.write(prj.getProjectBeschreibung());
+                csvOutput.write(String.valueOf(prj.getProjectBeschreibung()));
                 csvOutput.newLine();
             }
             csvOutput.close();
@@ -433,15 +515,61 @@ public class Betrieb{
         return true;
     }
 
+    public void tasksInProjectEnthalten(int projectId){
+        System.out.println("Projekt: " + getProjectById(projectId).getProjectBezeichnung() + ". Enthält Aufgaben:");
+        for (Aufgabe a:aufgaben){
+            if (a.getProjectId() == projectId){
+                a.printAufgabeShort();
+            }
+            
+        }
+    }
+
+    public boolean projekteCsvReader(){
+        
+        boolean fileAlreadyExists = new File("projekte.csv").exists();
+             
+        if (fileAlreadyExists){
+            try {
+                BufferedReader csvInput = new BufferedReader(new FileReader("projekte.csv"));
+                String line;
+                
+                while((line = csvInput.readLine()) != null){
+                    String[] projectRow = line.split(",");
+
+                    projekte.add(new Project(Integer.parseInt(projectRow[0]), 
+                                             projectRow[1], 
+                                             projectRow[2]));
+                }
+                    csvInput.close();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    return false;
+                }
+        }
+        else{
+            System.out.println("Die Datei \"projekte.csv\" existiert nicht!");
+            return false;
+        }
+        return true;
+    }
+    
+//======================================Betrieb========================================
+    public void readBetrieb(){
+        personenCsvReader();
+        projekteCsvReader();
+        orteCsvReader();
+        aufgabenCsvReader();
+    }
     
     
     
-    public Betrieb() {
+    
+    public Betrieb(){
         super();
         personen = new HashSet<Person>();
         projekte = new HashSet<Project>();
         orte = new HashSet<Ort>();
         aufgaben = new HashSet<Aufgabe>();
-        
-    }    
+    }
 }

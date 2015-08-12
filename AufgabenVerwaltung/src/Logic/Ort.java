@@ -49,8 +49,22 @@ public class Ort {
     }
     
     public void printOrt(){
-        System.out.println("OrtID: " + this.getOrtId() + "; Strasse: " + this.getStrasse() + "; Hausnummer: " + this.getHausNummer() + "; PLZ: " + this.getPlz() + "; Ortsname: " + this.getBezeichnung());  
+        System.out.println("OrtID: " + this.getOrtId() + 
+                         "; Strasse: " + this.getStrasse() + 
+                         "; Hausnummer: " + this.getHausNummer() + 
+                         "; PLZ: " + this.getPlz() + 
+                         "; Ortsname: " + this.getBezeichnung());  
     }
+    
+    public String toString(){
+        return ("OrtID: " + this.getOrtId() + 
+              "; Strasse: " + this.getStrasse() + 
+              "; Hausnummer: " + this.getHausNummer() + 
+              "; PLZ: " + this.getPlz() + 
+              "; Ortsname: " + this.getBezeichnung()); 
+    }
+    
+    
     
     
     public Ort(int ortId, String bezeichnung, String strasse, String hausNummer, String plz) {

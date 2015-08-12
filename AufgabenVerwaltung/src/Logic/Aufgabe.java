@@ -63,8 +63,12 @@ public class Aufgabe {
         this.bearbeiterId = bearbeiterID;
     }
     
-    public String getStatus() {
+    public String getStatusAsString() {
         return statusList[this.status];
+    }
+    
+    public int getStatus(){
+        return this.status;
     }
     
     public void setStatus(int status) {
@@ -121,8 +125,17 @@ public class Aufgabe {
     }
     
     
-    public Aufgabe(int aufgabeId, int projectId, String bezeichnung, int prioritaet, int bearbeiterId, int status, GregorianCalendar anfangsDatum,
-            int absehbareLaengeInTage, int ausuebungsOrtId, List<String> zusaetzlicheMerkmale) {
+    public Aufgabe(int aufgabeId, 
+                   int projectId, 
+                   String bezeichnung, 
+                   int prioritaet, 
+                   int bearbeiterId, 
+                   int status, 
+                   GregorianCalendar anfangsDatum,
+                   int stundenBudget, 
+                   int ausuebungsOrtId, 
+                   List<String> zusaetzlicheMerkmale) 
+        {
         super();
         this.aufgabeId = aufgabeId;
         this.projectId = projectId;
@@ -131,7 +144,7 @@ public class Aufgabe {
         this.bearbeiterId = bearbeiterId;
         this.status = status;
         this.anfangsDatum = anfangsDatum;
-        this.stundenBudget = absehbareLaengeInTage;
+        this.stundenBudget = stundenBudget;
         this.ausuebungsOrtId = ausuebungsOrtId;
         this.zusaetzlicheMerkmale = zusaetzlicheMerkmale;
     }

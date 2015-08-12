@@ -27,6 +27,7 @@ public class KonsoleFrontEnd {
         System.out.println("    taskprj -- Aufgaben in einem Projekt auflisten (Kentnis der ProjektID erforderlich)");
         System.out.println("    deltask -- Löschen einer Aufgabe (Kentniss der AufgabeID erforderlich)");
         System.out.println(" updatetask -- Änderung einer Aufgabe (Kentniss der AufgabeID erforderlich)");
+        System.out.println(" tasksreadf -- lesen der AufgabenListe aus der Datei \"aufgaben.csv\" in die aktuelle Aufgabenliste");
     }
     
 //==================================================Ort=====================================================    
@@ -114,6 +115,19 @@ public class KonsoleFrontEnd {
             
 //            scan.close();
     }
+    
+    public int orteZaehlerEinstellenBeimLesenAusDatei(){
+        int neuerIdZaehler = 1;
+        
+        if (!betrieb.getOrte().equals(null)){
+            for (Ort ort:betrieb.getOrte()){
+                if (ort.getOrtId() > neuerIdZaehler)  neuerIdZaehler = ort.getOrtId();           
+            }
+            neuerIdZaehler++;
+        }
+        return neuerIdZaehler;
+    }
+
     
 //==================================================Person=====================================================
 
@@ -225,6 +239,19 @@ public class KonsoleFrontEnd {
         else System.out.println("Vorgang abgebrochen");
     }
     
+    public int personenZaehlerEinstellenBeimLesenAusDatei(){
+        int neuerIdZaehler = 1;
+
+        if (!betrieb.getPersonen().equals(null)){
+            for (Person person:betrieb.getPersonen()){
+                if (person.getPersonId() > neuerIdZaehler)  neuerIdZaehler = person.getPersonId();           
+            }
+            neuerIdZaehler++;
+        }
+        return neuerIdZaehler;
+    }
+
+    
 // ==================================================Projekt=====================================================
     public static void addiereNeuesProjektAusDerKonsole(int iD){
         boolean abbruch = false;
@@ -277,6 +304,38 @@ public class KonsoleFrontEnd {
         }
         else System.out.println("Vorgang abgebrochen. Kein neues Projekt eingetragen.");
     }
+    
+    public static void listeAufgabenInProjekt(){
+        String inData;
+        
+        while(true){
+            betrieb.listeDerProjekte();
+            System.out.println("Geben Sie bitte die ProjektID ein (\"exit\" für Abbruch): ");
+            inData = scan.nextLine();
+            if (areDigits(inData) && betrieb.projectIdExists(Integer.parseInt(inData))){
+                betrieb.tasksInProjectEnthalten(Integer.parseInt(inData));
+                break;
+            }
+            if (inData.toLowerCase().equals("exit")) break;
+            
+            badInputMessage();
+        }
+        
+    }
+
+    public int projekteZaehlerEinstellenBeimLesenAusDatei(){
+        int neuerIdZaehler = 1;
+        
+        if (!betrieb.getProjekte().equals(null)){
+            for (Project pojekt:betrieb.getProjekte()){
+                if (pojekt.getProjectId() > neuerIdZaehler)  neuerIdZaehler = pojekt.getProjectId();           
+            }
+            neuerIdZaehler++;
+        }
+        return neuerIdZaehler;
+    }
+
+    
     
 // ==================================================Aufgabe=====================================================
     public static void addiereNeueAufgabeAusDerKonsole(int iD){
@@ -352,7 +411,8 @@ public class KonsoleFrontEnd {
                     break;
                 }
             }
-            System.out.println("Aufgabe nicht korrekt. Bitte geben Sie eine Zahl zwischen 1 und 10 ein.");
+            badInputMessage();
+            System.out.println("Bitte geben Sie eine Zahl zwischen 1 und 10 ein.");
         }
 
         while(!abbruch){
@@ -370,7 +430,7 @@ public class KonsoleFrontEnd {
                 }
                 else erstePerson = true;
                 
-            }else{ // es gibt schon Personen in der Personen-Tabelle
+            }else{ // es gibt schon Personen in der Personen-Tabelle 
             
                 betrieb.listeDerPersonen();
             
@@ -425,16 +485,15 @@ public class KonsoleFrontEnd {
             inData = scan.nextLine();
             System.out.println("Sie haben eingegeben: " + inData );
             if (inData.toLowerCase().equals("exit")){
-                abbruch = true; 
+                abbruch = true;
                 break;
             }
-            else if (areDigits(inData)){
+            else if (!inData.equals(null) && areDigits(inData)){
                 aufgabe.setStundenBudget(Integer.parseInt(inData)); 
                 break;
             }
             badInputMessage();
         }
-
         while(!abbruch){
             betrieb.listeDerOrte();
             System.out.println("Geben Sie bitte das OrtsID für den Ausübungsort dieser Aufgabe ein (\"n\" für neuen Ort oder \"exit\" für Abbruch):");
@@ -473,27 +532,216 @@ public class KonsoleFrontEnd {
         else System.out.println("Vorgang abgebrochen. Keine neue Aufgabe eingetragen."); //abgebrochene Eingabe. ABER. WAS IST MIT EINGETRAGENEN ORT, PERSON, PROJECT USW. DIE ANLEGEMÖGLICHKEIT GAR ENTNEHMEN?
     }
     
-//   public static boolean loescheAufgabeAusDerKonsole(){
-//       boolean allOk = false;
-//       while(allOk){
-//           System.out.println("Geben Sie bitte das ID der zu löschenden Aufgabe ein");
-//           int inData = scan.nextInt();
-//           System.out.println("Sie haben eingegeben: " + inData );
-//           
-//           if (betrieb.aufgabeIdExists(inData)){
-//               Aufgabe a = betrieb.getAufgabeById(inData);
-//               System.out.println("Folgende Aufgabe wird gelöscht:");
-//               System.out.println(betrieb.toString(a));
-//               while(allOk){
-//                   System.out.println("Sind Sie sicher? \"j\" für löschen, jede andere Eingabe für Stop");
-//                   
-//               }
-//           }
-//       }
-//       return allOk;
-//   }
+    public static void loescheAufgabePerId(){
+        while(true){
+            betrieb.listeDerAufgaben();
+            System.out.println("Geben Sie bitte die AufgabenID ein (\"exit\" für Abbruch):");
+            String inData = scan.nextLine();
+            
+            if (areDigits(inData) && betrieb.aufgabeIdExists(Integer.parseInt(inData))){
+                if(betrieb.loescheAufgabe(Integer.parseInt(inData))){
+                    System.out.println("Die Aufgabe wurde erfolgreich gelöscht");
+                    break;
+                }
+
+            }
+            if (inData.toLowerCase().equals("exit")){
+                break;
+            }
+            badInputMessage();
+        }
+    }
     
-// =========================================================================================================
+    
+    public static void aendereAufghabeAusKonsole(){
+        boolean erfolg = false;
+        boolean keinAbbruch = true;     //regulärer Abbruch, von Benutzer gewollt. ob nötig?
+        
+        while(keinAbbruch){
+
+            betrieb.listeDerAufgaben();
+            System.out.println("Geben Sie bitte die AufgabenID ein (\"exit\" für Abbruch): ");
+            String inData = scan.nextLine();
+            if (inData.toLowerCase().equals("exit")) break;
+            
+            if (areDigits(inData) && betrieb.aufgabeIdExists(Integer.parseInt(inData))){
+                
+                Aufgabe aufgabe = betrieb.getAufgabeById(Integer.parseInt(inData));
+            
+                System.out.println("Wählen Sie bitte zwischen folgenden Optionen:\n"
+                                    + "- \"b\": um Aufgabenbezeichnung zu ändern;\n"
+                                    + "- \"p\": um Priorität der Aufgabe zu ändern;\n"
+                                    + "- \"m\": um diese Aufgabe einem anderen Mitarbeiter zuzuordnen;\n"
+                                    + "- \"s\": um Aufgabenstatus zu ändern;\n"
+                                    + "- \"d\": um das AnfangsDatum der Aufgabe zu ändern;\n"
+                                    + "- \"o\": um einen anderen Ausübunsgsort für die Aufgabe zu wählen;\n"
+                                    + "- \"t\": um das stundenbudget der Aufgabe zu ändern.\n"
+                                    + "- \"exit\" oder \"Enter\" drücken: um in das Hauptmenu zurückzukehren.");
+                inData = scan.nextLine();
+                if (inData.toLowerCase().equals("exit") || inData.equals(null)) break;
+                if (inData.toLowerCase().equals("b")){
+                    System.out.println("Aktuelle Bezeichnung der Aufgabe: " + aufgabe.getBezeichnung());
+                    System.out.println("Geben Sie eine neue Bezeichnung ein. \"Enter\" um alte Bezeichnung beizubehalten: ");
+                    inData = scan.nextLine();
+                    
+                    if (!inData.equals(null)){
+                        aufgabe.setBezeichnung(inData);
+                        erfolg = true;
+                    }
+                    else break;
+                }
+                if (inData.toLowerCase().equals("p")){
+                    System.out.println("Aktuelle Priorität der Aufgabe: " + aufgabe.getPrioritaet());
+                    System.out.println("Geben Sie eine neuen Wert für Priorität der Aufgabe ein. \"Enter\" um alte Priorität beizubehalten: ");
+                    inData = scan.nextLine();
+ 
+                    if (!inData.equals(null)){
+                        while(true){
+                            if (areDigits(inData)){
+                                int i = Integer.parseInt(inData);
+                                
+                                if ((i >= 0) && (i <= 10)){
+                                    aufgabe.setPrioritaet(i);
+                                    erfolg = true;
+                                    break;
+                                }
+                                badInputMessage();
+                                System.out.print("(es muss eine Zahl zwischen 1 und 10 sein).");
+                                inData = scan.nextLine();
+                            }
+                        }
+                    }
+                    else break;
+                }
+
+                if (inData.toLowerCase().equals("m")){
+                    System.out.println("Aktuell ist die Aufgabe dem Mitarbeiter " + 
+                                        betrieb.getPersonById(aufgabe.getBearbeiterId()).getName() + 
+                                        " " + betrieb.getPersonById(aufgabe.getBearbeiterId()).getNachName() + 
+                                        ", ID: " + aufgabe.getBearbeiterId() + "zugeordnet.");
+                    betrieb.listeDerPersonen();
+
+                    System.out.print("Geben Sie eine Mitarbeiter-ID für den neuen Mitarbeiter ein. \"Enter\" um alten Wert beizubehalten: ");
+                    inData = scan.nextLine();
+                    
+                    if (!inData.equals(null)){
+                        while(true){
+                            if (areDigits(inData) && betrieb.personIdExists(Integer.parseInt(inData))){
+                                aufgabe.setBearbeiterId(Integer.parseInt(inData));
+                                erfolg = true;
+                            }
+                            badInputMessage();
+                            betrieb.listeDerPersonen();
+                            System.out.print("Ihre Wahl: ");
+                            inData = scan.nextLine();
+                        }
+                    }
+
+                    else break;
+                }
+                if (inData.toLowerCase().equals("s")){
+                    System.out.println("Aktueller Status der Aufgabe: " + aufgabe.getStatusAsString());
+                    System.out.println("Geben Sie einen neuen Status ein: \n"
+                                        + " - \"0\" für \"angefangen\"\n"
+                                        + " - \"1\" für \"in Bearbeitung\"\n"
+                                        + " - \"2\" für \"angehalten\"\n"
+                                        + " - \"3\" für \"abgeschlossen\"\n"
+                                        + "Enter\" um alten Wert beizubehalten. ");
+                    System.out.print("Ihre Wahl: ");
+                    inData = scan.nextLine();
+                    if (!inData.equals(null)){
+                        if (areDigits(inData)){
+                            int i = Integer.parseInt(inData);
+                            if ((i >= 0) && (i <= 3)) aufgabe.setStatus(i);
+                            erfolg = true;
+                        }
+                    }
+                    else break;
+                }
+                
+                if (inData.toLowerCase().equals("d")){
+                    System.out.println("Aktuelle Anfangsdatum der Aufgabe: " + aufgabe.getAnfangsDatum());
+                    System.out.println("Geben Sie \"n\" für das neue Anfangsdatum. Jede weitere Taste - Abbruch: ");
+
+                    inData = scan.nextLine();
+ 
+                    if (inData.toLowerCase().equals("n")){
+                        aufgabe.setAnfangsDatum(dateEingabe());
+                        erfolg = true;
+                    }
+                    else break;
+                }
+                
+                if (inData.toLowerCase().equals("o")){
+                    System.out.println("Aktuelle Ausübungsort der Aufgabe: " + betrieb.getOrtById(aufgabe.getAusuebungsOrt()).toString());
+                    System.out.println("Geben Sie \"n\" für das neue Anfangsdatum. Jede weitere Taste - Abbruch: ");
+
+                    inData = scan.nextLine();
+ 
+                    if (inData.toLowerCase().equals("n")){
+                        betrieb.listeDerOrte();
+                        System.out.print("Geben Sie bitte die ID des anderen Ortes ein, \"Enter\" für abbruch:");
+                        inData = scan.nextLine();
+                        if (!inData.toLowerCase().equals(null)){
+                            while(true){
+                                if (areDigits(inData) && betrieb.ortIdExists(Integer.parseInt(inData))){
+                                    aufgabe.setAusuebungsOrt(Integer.parseInt(inData));
+                                    erfolg = true;
+                                }
+                                else badInputMessage();
+                                betrieb.listeDerOrte();
+                                System.out.print("Ihre Wahl: ");
+                                inData = scan.nextLine();
+                            }
+                        }
+                    }
+                    else break;
+                }
+            
+                if (inData.toLowerCase().equals("t")){
+                    System.out.println("Aktuelles Stundenbudget der Aufgabe: " + aufgabe.getStundenBudget());
+                    System.out.println("Geben Sie eine neuen Wert für das Stundenbudget der Aufgabe ein. \"Enter\" um alte Priorität beizubehalten: ");
+                    inData = scan.nextLine();
+    
+                    if (!inData.equals(null)){
+                        if (areDigits(inData)){
+                            int i = Integer.parseInt(inData);
+                            aufgabe.setStundenBudget(i);
+                            erfolg = true;
+                        }
+                    }
+                    else break;
+                }
+                if(erfolg){
+                    betrieb.replaceAufgabe(aufgabe);
+                    break;
+                }
+                else{
+                    System.out.println();
+                    System.out.println("Neuer Versuch. Muss eigentlich nicht sein.");
+                    System.out.println();
+                }
+            }
+        }
+    }
+    
+    
+    
+//    else breaks - nafiga? ved' posle pervoj proverki ujdet v nikuda...
+    
+    public int aufgabenZaehlerEinstellenBeimLesenAusDatei(){
+        int neuerIdZaehler = 1;
+        
+        if (!betrieb.getAufgaben().equals(null)){
+            for (Aufgabe aufgabe:betrieb.getAufgaben()){
+                if (aufgabe.getAufgabeId() > neuerIdZaehler)  neuerIdZaehler = aufgabe.getAufgabeId();           
+            }
+            neuerIdZaehler++;
+        }
+        return neuerIdZaehler;
+    }
+
+    // =========================================================================================================
     
 
     public static GregorianCalendar dateEingabe(){ // Eingabe des Datums per Tastatur, wird an mehreren Stellen benutzt
@@ -520,19 +768,19 @@ public class KonsoleFrontEnd {
         while(true){    
             System.out.println("Jahr (jj):");
             eingabe = scan.nextInt();
+            
             if ((eingabe >= 0) && (eingabe < 100)){
                 jahr = eingabe;
                 if (jahr > 50) jahr = 1900 + jahr;
                 else jahr = 2000 + jahr;
                 break;
             }
+            
             badInputMessage();
         }
         
         datum.set(jahr, monat, tag);
-//        scan.close();
         System.out.println(datum.getTime().toString());
-//        String inData = scan.nextLine();
         return datum;
     }
   
@@ -545,17 +793,17 @@ public class KonsoleFrontEnd {
         
     }
  
-    static void badInputMessage()
-    {
+    static void badInputMessage(){
+        System.out.println();
         System.out.println("Falsche eingabe, bitte widerholen Sie sie!");
     }
-    
     public static void main(String[] args){
         boolean abbruch = false;
         betrieb = new Betrieb();
         String inData;
         while(!abbruch){
-            System.out.print("Geben Sie einen Befehl ein oder \"help\" für die Befehlslisgte: ");
+            help();
+            System.out.print("Geben Sie einen Befehl ein: ");
             inData = scan.nextLine();
             System.out.println("Sie haben eingegeben: " + inData );
             System.out.println();
@@ -565,13 +813,19 @@ public class KonsoleFrontEnd {
                 case "NEWTASK": addiereNeueAufgabeAusDerKonsole(aufgabenIdZaehler); aufgabenIdZaehler++; break;
                 case "NEWPLACE": addiereNeuenOrtAusDerKonsole(ortIdZaehler);        ortIdZaehler++;      break;
                 case "NEWSTUFF": addiereNeuePersonAusDerKonsole(personIdZaehler);   personIdZaehler++;   break;
-                case "PRINTPRJ": betrieb.listeDerProjekte();   break;
-                case "PRINTTASKS": betrieb.listeDerAufgaben(); break;
-                case "PRINTSTUFF": betrieb.listeDerPersonen(); break;
-                case "PRINTPLACES": betrieb.listeDerOrte();    break;
-                case "TASKPRJ":    break;
-                case "DELTASK":    break;
-                case "UPDATETASK": break;
+                case "PRINTPRJ": betrieb.listeDerProjekte();    break;
+                case "PRINTTASKS": betrieb.listeDerAufgaben();  break;
+                case "PRINTSTUFF": betrieb.listeDerPersonen();  break;
+                case "PRINTPLACES": betrieb.listeDerOrte();     break;
+                case "TASKPRJ":  listeAufgabenInProjekt();      break;
+                case "DELTASK":  loescheAufgabePerId();         break;
+                case "UPDATETASK": aendereAufghabeAusKonsole(); break;
+                case "BETRIEB-RF": betrieb.aufgabenCsvReader(); 
+                                   projekteZaehlerEinstellenBeimLesenAusDatei(); 
+                                   orteZaehlerEinstellenBeimLesenAusDatei(); 
+                                   personenZaehlerEinstellenBeimLesenAusDatei();
+                                   aufgabenZaehlerEinstellenBeimLesenAusDatei();
+                                   break;
                 case "EXIT": abbruch = true; break;
                 default: System.out.println("Befehl nicht erkannt."); System.out.println(); break;
             }
@@ -582,3 +836,30 @@ public class KonsoleFrontEnd {
         scan.close();
     }
 }
+
+//======================================================BUG-LOG==============================================================
+
+
+// PLZ kann beliebig lang sein, nur das erste Symbol wird auf digit() geprüft.
+// beim Speichern der Task in .csv wird status als tekst gespeichert. muss zahl sein.
+
+// Datenitegrität: wenn wir eine Tabelle aus der Datei laden und andere - nicht. Nix gut. Soll abgefangen werden oder alles in einer datei. Mist. 
+// Entscheidung: erst alles zusammen laden, das ganze betrieb, alles jedoch in einzelnen Dateien. 
+//Die ganze Integritätsüberprüngs-Logic danach mal bei Gelegenheit programmieren. oder doch in einer Datei.
+
+// neuer_mensch: undeutig message bei Geburts/Wohnort - eingabe.
+// Aufgabe.getbearbeitername shreiben.
+// bei taskprj: besser _Namen_ der Bearbeiter, als id.
+// Errormessage bei falscher Nummer in Updatetask.
+// in menu bei updatetask - kein projekt, aufgabe.
+
+// beim auflisten sind die frischeste einträge zuerst, die numerierung (IDs) ist dann entsprechend umgekehrt. nix gut.
+
+//Kontrole, ob die aufgaben gleiche bezeichnungen haben? ob notig?
+//Wenn aus einer datei gelesen - Nummercheck notwendig, das die Nummern nicht doppelt vorhanden? 
+
+//wenn die Daten aus einer Datei gelesen werden - die ID-Zaehler sollen dann auf maximalen Wert gesetzt werden
+
+// s takim podxodom k date jeto zh mozhno fevral' otlavlivat', xotja by do 29
+
+// keine begrenzung zu Person.Status, Person.Geschlecht, AufgabenArt, 
