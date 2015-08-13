@@ -118,11 +118,7 @@ public class Aufgabe {
     public String[] getAufgabenArt() {
         return aufgabenArt;
     }
-    public void printAufgabeShort(){
-        System.out.println("AufgabenID: " + this.getAufgabeId() + "; ProjektID: " + this.getProjectId() + 
-                "; Aufgabenbezeichnung: " + this.getBezeichnung() + "; BearbeiterID: " + this.getBearbeiterId() + "; StundenBudget: " + this.getStundenBudget() + ".\n"); 
-      
-    }
+
     
     
     public Aufgabe(int aufgabeId, 

@@ -61,7 +61,7 @@ public class Person {
     
     
     public String getName(){
-        return (this.vorName + " " + this.vorName);
+        return (this.vorName + " " + this.nachName);
     }
     
     public Person(int personId, String vorName, String nachName, int geschlecht, int ortId, GregorianCalendar userGeburtsDatum){

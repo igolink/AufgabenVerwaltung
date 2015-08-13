@@ -27,7 +27,7 @@ public class KonsoleFrontEnd {
         System.out.println("    taskprj -- Aufgaben in einem Projekt auflisten (Kentnis der ProjektID erforderlich)");
         System.out.println("    deltask -- Löschen einer Aufgabe (Kentniss der AufgabeID erforderlich)");
         System.out.println(" updatetask -- Änderung einer Aufgabe (Kentniss der AufgabeID erforderlich)");
-        System.out.println(" tasksreadf -- lesen der AufgabenListe aus der Datei \"aufgaben.csv\" in die aktuelle Aufgabenliste");
+        System.out.println(" betrieb-rf -- lesen der Tabellen aus den .csv Dateien");
     }
     
 //==================================================Ort=====================================================    
@@ -116,7 +116,7 @@ public class KonsoleFrontEnd {
 //            scan.close();
     }
     
-    public int orteZaehlerEinstellenBeimLesenAusDatei(){
+    public static int orteZaehlerEinstellenBeimLesenAusDatei(){
         int neuerIdZaehler = 1;
         
         if (!betrieb.getOrte().equals(null)){
@@ -239,7 +239,7 @@ public class KonsoleFrontEnd {
         else System.out.println("Vorgang abgebrochen");
     }
     
-    public int personenZaehlerEinstellenBeimLesenAusDatei(){
+    public static int personenZaehlerEinstellenBeimLesenAusDatei(){
         int neuerIdZaehler = 1;
 
         if (!betrieb.getPersonen().equals(null)){
@@ -323,7 +323,7 @@ public class KonsoleFrontEnd {
         
     }
 
-    public int projekteZaehlerEinstellenBeimLesenAusDatei(){
+    public static int projekteZaehlerEinstellenBeimLesenAusDatei(){
         int neuerIdZaehler = 1;
         
         if (!betrieb.getProjekte().equals(null)){
@@ -729,7 +729,7 @@ public class KonsoleFrontEnd {
     
 //    else breaks - nafiga? ved' posle pervoj proverki ujdet v nikuda...
     
-    public int aufgabenZaehlerEinstellenBeimLesenAusDatei(){
+    public static int aufgabenZaehlerEinstellenBeimLesenAusDatei(){
         int neuerIdZaehler = 1;
         
         if (!betrieb.getAufgaben().equals(null)){
@@ -771,7 +771,7 @@ public class KonsoleFrontEnd {
             
             if ((eingabe >= 0) && (eingabe < 100)){
                 jahr = eingabe;
-                if (jahr > 50) jahr = 1900 + jahr;
+                if (jahr >= 20) jahr = 1900 + jahr;
                 else jahr = 2000 + jahr;
                 break;
             }
@@ -820,7 +820,7 @@ public class KonsoleFrontEnd {
                 case "TASKPRJ":  listeAufgabenInProjekt();      break;
                 case "DELTASK":  loescheAufgabePerId();         break;
                 case "UPDATETASK": aendereAufghabeAusKonsole(); break;
-                case "BETRIEB-RF": betrieb.aufgabenCsvReader(); 
+                case "BETRIEB-RF": betrieb.readBetrieb(); 
                                    projekteZaehlerEinstellenBeimLesenAusDatei(); 
                                    orteZaehlerEinstellenBeimLesenAusDatei(); 
                                    personenZaehlerEinstellenBeimLesenAusDatei();
@@ -847,11 +847,16 @@ public class KonsoleFrontEnd {
 // Entscheidung: erst alles zusammen laden, das ganze betrieb, alles jedoch in einzelnen Dateien. 
 //Die ganze Integritätsüberprüngs-Logic danach mal bei Gelegenheit programmieren. oder doch in einer Datei.
 
-// neuer_mensch: undeutig message bei Geburts/Wohnort - eingabe.
+// neuer_mensch: undeutig message bei Wohnort - eingabe.
+
 // Aufgabe.getbearbeitername shreiben.
 // bei taskprj: besser _Namen_ der Bearbeiter, als id.
 // Errormessage bei falscher Nummer in Updatetask.
 // in menu bei updatetask - kein projekt, aufgabe.
+
+// Status der Task als eine Zahl in die Datei schreiben!!!
+
+// Bei Personen ist es möglich die zukünftigen Datums einzugeben. lieber bis jetzt-18 jahre. oder -16, falls schüler zugelassen werden. boolean minderjährig?
 
 // beim auflisten sind die frischeste einträge zuerst, die numerierung (IDs) ist dann entsprechend umgekehrt. nix gut.
 

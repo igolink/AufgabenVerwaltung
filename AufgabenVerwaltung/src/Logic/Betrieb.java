@@ -9,9 +9,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
+//import java.time.format.DateTimeFormatter;
+//import java.util.Calendar;
+//import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +27,7 @@ public class Betrieb{
     private Set<Ort> orte;
     private Set<Aufgabe> aufgaben;
     private final char TRENNZEICHEN = ',';
-    private final char ARRAY_SEPARATOR = ';';
+//    private final char ARRAY_SEPARATOR = ';';
     
     public Set<Person> getPersonen() {
         return personen;
@@ -174,8 +174,6 @@ public class Betrieb{
 }
 
     
-    
-    
 //==================================================Aufgaben============================================    
 
     public boolean addiereAufgabe(Aufgabe aufgabe){
@@ -196,13 +194,13 @@ public class Betrieb{
               "; Projekt: " + getProjectById(aufgabe.getProjectId()).getProjectBezeichnung() + 
               "; Bearbeiter: " + getPersonById(aufgabe.getBearbeiterId()).getName() + 
             ".\n Aufgabenpriorität (1: niedrig bis 10: hoch): " + aufgabe.getPrioritaet() + 
-              "; Aufgabenstatus: " + aufgabe.getStatusAsString() + "; Anfang: " + aufgabe.getAnfangsDatum().toString() + 
+              "; Auf+gabenstatus: " + aufgabe.getStatusAsString() + "; Anfang: " + aufgabe.getAnfangsDatum().toString() + 
               "; Ausübungsstandort: " + getOrtById(aufgabe.getAusuebungsOrt()).getBezeichnung());
     }
     
     public void listeDerAufgaben(){
         for (Aufgabe aufgabe:aufgaben){
-            aufgabe.printAufgabeShort();
+            printAufgabeShort(aufgabe);
 //            System.out.println("AufgabenID: " + aufgabe.getAufgabeId() + "; Bezeichnung: " + aufgabe.getBezeichnung() + "; Projekt: " + getProjectById(aufgabe.getProjectId()).getProjectBezeichnung() + "; " + "Bearbeiter: " + getPersonById(aufgabe.getBearbeiterId()).getName() + ".");
 //            System.out.println("Aufgabenpriorität (1: niedrig bis 10: hoch): " + aufgabe.getPrioritaet() + "; Aufgabenstatus: " + aufgabe.getStatus() + "; Anfang: " + aufgabe.getAnfangsDatum().toString() + "; Ausübungsstandort: " + getOrtById(aufgabe.getAusuebungsOrt()).getBezeichnung());
         }
@@ -210,6 +208,15 @@ public class Betrieb{
     
     public boolean loescheAufgabe(int iD){
         return this.aufgaben.remove(getAufgabeById(iD));
+    }
+    
+    public void printAufgabeShort(Aufgabe aufgabe){
+        System.out.println("AufgabenID: "          + aufgabe.getAufgabeId() + 
+                         "; ProjektID: "           + aufgabe.getProjectId() + 
+                         "; Aufgabenbezeichnung: " + aufgabe.getBezeichnung() + 
+                         "; Bearbeiter: "          + getPersonById(aufgabe.getBearbeiterId()).getName() + "(ID" + aufgabe.getBearbeiterId() + 
+                       ") ; StundenBudget: "       + aufgabe.getStundenBudget() + "."); 
+      
     }
     
     public boolean aufgabeIdExists(int iD){
@@ -244,16 +251,16 @@ public class Betrieb{
                         return false;
                     }
 
-                    aufgaben.add(new Aufgabe(Integer.parseInt(taskRow[0]), 
-                                             Integer.parseInt(taskRow[1]), 
-                                             taskRow[2], 
-                                             Integer.parseInt(taskRow[3]), 
-                                             Integer.parseInt(taskRow[4]), 
-                                             Integer.parseInt(taskRow[5]), 
-                                             taskDateOfStart, 
-                                             Integer.parseInt(taskRow[7]), 
-                                             Integer.parseInt(taskRow[8]), 
-                                             dummy));
+                    aufgaben.add(new Aufgabe(Integer.parseInt(taskRow[0]), //AufgabenID
+                                             Integer.parseInt(taskRow[1]), //ProjektID
+                                             taskRow[2],                   //Aufgabenbezeichnung
+                                             Integer.parseInt(taskRow[3]), //Aufgabenpriorität
+                                             Integer.parseInt(taskRow[4]), //BearbeiterID
+                                             Integer.parseInt(taskRow[5]), //Status
+                                             taskDateOfStart,              //Anfangsdatum
+                                             Integer.parseInt(taskRow[7]), //Stundenbudget
+                                             Integer.parseInt(taskRow[8]), //ID des Ausübungsortes
+                                             dummy));                      //Sollen besondere Merkmale sein
                     
                 }
                     csvInput.close();
@@ -519,7 +526,7 @@ public class Betrieb{
         System.out.println("Projekt: " + getProjectById(projectId).getProjectBezeichnung() + ". Enthält Aufgaben:");
         for (Aufgabe a:aufgaben){
             if (a.getProjectId() == projectId){
-                a.printAufgabeShort();
+                printAufgabeShort(a);
             }
             
         }
@@ -561,10 +568,7 @@ public class Betrieb{
         orteCsvReader();
         aufgabenCsvReader();
     }
-    
-    
-    
-    
+     
     public Betrieb(){
         super();
         personen = new HashSet<Person>();
